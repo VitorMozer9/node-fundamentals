@@ -8,7 +8,22 @@
 
 //process.stdin  || portas de entrada e saida, stdin e stdout, neste caso tudo que recebo como entrada eu encaminho como saida
 //    .pipe(process.stdout)
-import { Readable } from 'node:stream'
+import { Readable , Writable, Transform } from 'node:stream'
+
+class InverseNumerStream extends Transform{
+    _transform(chunck, encoding, callback){
+        const transformed = Number(chunck.toString()) * -1
+
+        callback(null, Buffer.from(String(transformed))) //Buffer serve para transicionar dados
+    }
+}
+
+ class MultiplyByTenStream extends Writable {
+    _write(chunck, encoding , callback){
+            console.log(Number(chunck.toString()) * 10)
+            callback()
+    }
+ }
 
 class OneToHundredStream extends Readable {
     index = 1
@@ -27,4 +42,5 @@ class OneToHundredStream extends Readable {
 }
 
 new OneToHundredStream()
-    .pipe(process.stdout)
+    .pipe(new InverseNumerStream())
+    .pipe(new MultiplyByTenStream())
